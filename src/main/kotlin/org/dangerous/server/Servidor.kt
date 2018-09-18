@@ -13,26 +13,33 @@ import java.net.Inet4Address
 import java.net.InetSocketAddress
 import java.net.ServerSocket
 import java.util.concurrent.Executors
+import java.util.logging.Logger
 
 object Servidor {
     private lateinit var socket: ServerSocket
     private val EXECUTOR = Executors.newScheduledThreadPool(50)
     private val mapper = jacksonObjectMapper()
+    private val LOG = Logger.getLogger("Server")
+
 
     @JvmStatic
     fun main(args: Array<String>) {
         socket = ServerSocket(6379)
 
+        LOG.info("[Server] Starting server on port 6379")
+
         EXECUTOR.submit {
             while (true) {
                 val connection = socket.accept()
+
+                LOG.info("[Server] Received client from IP: ${connection.inetAddress.hostName}")
 
                 val output = ObjectOutputStream(connection.getOutputStream())
                 val input = ObjectInputStream(connection.getInputStream())
 
                 EXECUTOR.submit {
                     while (true) {
-                        if (!connection.isConnected)
+                        if (!connection.isConnected || connection.isClosed)
                             break
 
                         try {
@@ -76,9 +83,5 @@ object Servidor {
                 }
             }
         }
-    }
-
-    fun <T> ObjectOutputStream.sendResponse(resposta: Resposta<T>) {
-        this.writeUnshared(mapper.writeValueAsString(resposta))
     }
 }

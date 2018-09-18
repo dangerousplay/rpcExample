@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tcp-server
+  labels:
+    app: tcp-server
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: tcp-server
+      labels:
+        app: tcp-server
+    spec:
+      containers:
+      - name: tcp-server
+        image: tcp-jsonrpc
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: tcp-server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcp-server
+spec:
+  selector:
+    app: tcp-server
+  ports:
+  - port: 6379
+  type: NodePort

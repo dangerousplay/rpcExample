@@ -20,3 +20,24 @@ compileKotlin {
 compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
+
+task fatServerJar(type: Jar) {
+    baseName = 'server-fat'
+    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes["Main-Class"] = "org.dangerous.server.Servidor"
+    }
+    with jar
+}
+
+task fatClientJar(type: Jar){
+    baseName = 'client-fat'
+    from { configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes["Main-Class"] = "org.dangerous.client.Cliente"
+    }
+    with jar
+}
+
+build.dependsOn fatServerJar
+build.dependsOn fatClientJar

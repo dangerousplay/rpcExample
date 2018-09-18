@@ -11,10 +11,12 @@ import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
 import java.util.concurrent.TimeUnit
+import java.util.logging.Logger
 
 class Cliente {
     companion object {
         private val scheduler = Executors.newScheduledThreadPool(2)
+        private val LOG = Logger.getLogger("Client")
 
         @JvmStatic
         fun main(args: Array<String>) {
@@ -25,6 +27,8 @@ class Cliente {
                 hostname = args[0]
                 port = args[1].toInt()
             }
+
+            LOG.info("[Client] Connecting on server... IP: $hostname Port: $port")
 
             val socket = Socket(hostname, port)
 
