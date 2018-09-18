@@ -8,35 +8,38 @@ import java.io.OutputStream
 import java.lang.Exception
 import java.net.Socket
 import java.util.*
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
 
 class Cliente {
     companion object {
+        private val scheduler = Executors.newScheduledThreadPool(2)
+
         @JvmStatic
         fun main(args: Array<String>) {
-            val socket = Socket("127.0.0.1", 6379)
+            val socket = Socket("localhost", 6379)
 
             val output = ObjectOutputStream(socket.getOutputStream())
             val input = ObjectInputStream(socket.getInputStream())
             val mapper = jacksonObjectMapper()
 
-            while(true){
-                val comando = Comando(UUID.randomUUID(), Comando.Operacao.SOMA, arrayOf(1,2))
-                mapper.writeValue(output as OutputStream,comando)
+
+            scheduler.scheduleAtFixedRate({
+                val comando = Comando(UUID.randomUUID(), Comando.Operacao.SOMA, arrayOf(1, 2))
+                output.writeUnshared(mapper.writeValueAsString(comando))
+                //mapper.writeValue(output as OutputStream,comando)
 
                 try {
                     val resultado = input.readUnshared()
 
-                    when(resultado){
-                        resultado is String -> {
-                            println(resultado)
-                        }
+                    if(resultado is String){
+                        println(resultado)
                     }
-                }catch (e: Exception){
-
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-
-                Thread.sleep(2000)
-            }
+            }, 1000,1000, TimeUnit.MILLISECONDS)
         }
     }
 }
