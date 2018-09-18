@@ -18,7 +18,15 @@ class Cliente {
 
         @JvmStatic
         fun main(args: Array<String>) {
-            val socket = Socket("localhost", 6379)
+            var hostname = "localhost"
+            var port = 6379
+
+            if (args.isNotEmpty()) {
+                hostname = args[0]
+                port = args[1].toInt()
+            }
+
+            val socket = Socket(hostname, port)
 
             val output = ObjectOutputStream(socket.getOutputStream())
             val input = ObjectInputStream(socket.getInputStream())
@@ -33,13 +41,13 @@ class Cliente {
                 try {
                     val resultado = input.readUnshared()
 
-                    if(resultado is String){
+                    if (resultado is String) {
                         println(resultado)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
-            }, 1000,1000, TimeUnit.MILLISECONDS)
+            }, 1000, 1000, TimeUnit.MILLISECONDS)
         }
     }
 }
