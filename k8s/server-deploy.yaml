@@ -5,7 +5,7 @@ metadata:
   labels:
     app: tcp-server
 spec:
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       name: tcp-server
@@ -30,4 +30,16 @@ spec:
     app: tcp-server
   ports:
   - port: 6379
-  type: NodePort
+  type: LoadBalancer
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: tcp-server
+spec:
+  maxReplicas: 10
+  minReplicas: 2
+  scaleTargetRef:
+    kind: Deployment
+    name: tcp-server
+  targetCPUUtilizationPercentage: 50

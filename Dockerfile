@@ -8,15 +8,17 @@ RUN ./gradlew fatServerJar
 
 WORKDIR /build/build/libs
 
-RUN native-image --static -jar server-fat-1.0-SNAPSHOT.jar
+#RUN native-image -jar server-fat-1.0-SNAPSHOT.jar
 
-FROM alpine
+FROM openjdk:8
 
 WORKDIR /app
 
-COPY --from=builder ./build/build/libs/server-fat-1.0-SNAPSHOT .
+COPY --from=builder ./build/build/libs/server-fat-1.0-SNAPSHOT.jar .
 
-CMD ["./server-fat-1.0-SNAPSHOT"]
+ENTRYPOINT ["java", "-jar", "server-fat-1.0-SNAPSHOT.jar"]
+
+#CMD ["./server-fat-1.0-SNAPSHOT"]
 
 #FROM openjdk:8
 #
