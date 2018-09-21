@@ -16,6 +16,8 @@ spec:
       - name: tcp-server
         image: tcp-jsonrpc
         imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 6379
       restartPolicy: Always
   selector:
     matchLabels:
@@ -30,6 +32,7 @@ spec:
     app: tcp-server
   ports:
   - port: 6379
+    targetPort: 6379
   type: LoadBalancer
 ---
 apiVersion: autoscaling/v1
