@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import org.dangerous.model.Comando
 import org.dangerous.model.Resposta
+import java.io.EOFException
 import java.io.ObjectInputStream
 import java.io.ObjectOutputStream
 import java.io.OutputStream
@@ -39,7 +40,7 @@ object Servidor {
 
                 EXECUTOR.submit {
                     while (true) {
-                        if (!connection.isConnected || connection.isClosed)
+                        if (!connection.isConnected || connection.isClosed || !connection.isBound)
                             break
 
                         try {
@@ -77,6 +78,9 @@ object Servidor {
                                 }
                             }
                         } catch (e: Exception) {
+                            if(e is EOFException)
+                                break
+
                             e.printStackTrace()
                         }
                     }

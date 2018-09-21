@@ -10,6 +10,6 @@ COPY ./build/libs /app
 
 WORKDIR /app
 
-ENTRYPOINT ["java", "-jar", "server-fat-1.0-SNAPSHOT.jar"]
-
 EXPOSE 6379
+
+ENTRYPOINT ["java", "-jar", "server-fat-1.0-SNAPSHOT.jar"]

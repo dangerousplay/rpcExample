@@ -10,6 +10,7 @@ import java.net.Socket
 import java.util.*
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.ThreadLocalRandom
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
@@ -17,6 +18,12 @@ class Cliente {
     companion object {
         private val scheduler = Executors.newScheduledThreadPool(2)
         private val LOG = Logger.getLogger("Client")
+
+        fun <E> List<E>.random(): E? = if (size > 0) get(ThreadLocalRandom.current().nextInt()) else null
+
+        fun <E> Array<E>.random(): E = get(ThreadLocalRandom.current().nextInt(size))
+
+        fun nextInt() : Int = ThreadLocalRandom.current().nextInt()
 
         @JvmStatic
         fun main(args: Array<String>) {
@@ -38,15 +45,19 @@ class Cliente {
 
 
             scheduler.scheduleAtFixedRate({
-                val comando = Comando(UUID.randomUUID(), Comando.Operacao.SOMA, arrayOf(1, 2))
-                output.writeUnshared(mapper.writeValueAsString(comando))
-                //mapper.writeValue(output as OutputStream,comando)
+                val comando = Comando(UUID.randomUUID(), Comando.Operacao.values().random(), arrayOf(nextInt(), nextInt()))
+
+                val jsoncomand = mapper.writeValueAsString(comando)
+
+                LOG.info("[Client] Sending request to server: $jsoncomand")
+
+                output.writeUnshared(jsoncomand)
 
                 try {
                     val resultado = input.readUnshared()
 
                     if (resultado is String) {
-                        println(resultado)
+                        LOG.info("[Client] Server response: $resultado")
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
