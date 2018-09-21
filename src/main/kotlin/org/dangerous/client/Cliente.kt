@@ -25,6 +25,8 @@ class Cliente {
 
         fun nextInt() : Int = ThreadLocalRandom.current().nextInt()
 
+        fun nextDouble() : Double = ThreadLocalRandom.current().nextDouble()
+
         @JvmStatic
         fun main(args: Array<String>) {
             var hostname = "localhost"
@@ -45,7 +47,7 @@ class Cliente {
 
 
             scheduler.scheduleAtFixedRate({
-                val comando = Comando(UUID.randomUUID(), Comando.Operacao.values().random(), arrayOf(nextInt(), nextInt()))
+                val comando = Comando(UUID.randomUUID(), Comando.Operacao.values().random(), arrayOf(nextDouble()* nextInt(), nextDouble()* nextInt()))
 
                 val jsoncomand = mapper.writeValueAsString(comando)
 

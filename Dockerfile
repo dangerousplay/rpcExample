@@ -12,4 +12,4 @@ WORKDIR /app
 
 EXPOSE 6379
 
-ENTRYPOINT ["java", "-jar", "server-fat-1.0-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "-Xmx128m", "server-fat-1.0-SNAPSHOT.jar"]

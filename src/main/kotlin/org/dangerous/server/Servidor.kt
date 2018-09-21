@@ -10,9 +10,11 @@ import java.io.ObjectOutputStream
 import java.io.OutputStream
 import java.lang.Exception
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.net.Inet4Address
 import java.net.InetSocketAddress
 import java.net.ServerSocket
+import java.net.SocketException
 import java.util.concurrent.Executors
 import java.util.logging.Logger
 
@@ -51,24 +53,27 @@ object Servidor {
 
                                 when (comando.op) {
                                     Comando.Operacao.DIVISAO -> {
-                                        val divided = comando.argumentos.map { BigDecimal(it.toString()) }.reduce { A, B -> A.divide(B) }
+                                        val divided = comando.argumentos.map { BigDecimal(it.toString()) }.reduce { A, B -> A.divide(B, 10, RoundingMode.UP) }
                                         val resposta = Resposta<BigDecimal>(comando.id, divided)
 
                                         //mapper.writeValue(output as OutputStream, resposta)
                                         output.writeUnshared(mapper.writeValueAsString(resposta))
                                     }
+
                                     Comando.Operacao.MULTIPLICACAO -> {
                                         val times = comando.argumentos.map { BigDecimal(it.toString()) }.reduce { A, B -> A.multiply(B) }
                                         val resposta = Resposta<BigDecimal>(comando.id, times)
 
                                         output.writeUnshared(mapper.writeValueAsString(resposta))
                                     }
+
                                     Comando.Operacao.SOMA -> {
                                         val sum = comando.argumentos.map { BigDecimal(it.toString()) }.reduce { A, B -> A.add(B) }
                                         val resposta = Resposta<BigDecimal>(comando.id, sum)
 
                                         output.writeUnshared(mapper.writeValueAsString(resposta))
                                     }
+
                                     Comando.Operacao.SUBTRACAO -> {
                                         val subtract = comando.argumentos.map { BigDecimal(it.toString()) }.reduce { A, B -> A.subtract(B) }
                                         val resposta = Resposta<BigDecimal>(comando.id, subtract)
@@ -78,7 +83,7 @@ object Servidor {
                                 }
                             }
                         } catch (e: Exception) {
-                            if(e is EOFException)
+                            if(e is EOFException || e is SocketException)
                                 break
 
                             e.printStackTrace()
